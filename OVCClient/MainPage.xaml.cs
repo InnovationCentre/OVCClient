@@ -23,8 +23,25 @@ namespace OVCClient
         {
             this.InitializeComponent();
             MainFrame.Navigate(typeof(SendStatus));
+
+            this.SizeChanged += ResponsivePage_SizeChanged;
         }
 
+        private void ResponsivePage_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+           if (e.NewSize.Width > 970)
+            {
+                VisualStateManager.GoToState(this, "Expanded", true);
+            }
+            else if (e.NewSize.Width > 650)
+            {
+                VisualStateManager.GoToState(this, "Compact", true);
+            }
+            //else
+            //{
+            //    VisualStateManager.GoToState(this, "UltraCompact", true);
+            //}
+        }
 
         private void MessagesOverview_Click(object sender, RoutedEventArgs e)
         {
@@ -57,5 +74,4 @@ namespace OVCClient
             await messageDialog.ShowAsync();
         }
     }
-
 }

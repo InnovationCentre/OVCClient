@@ -21,9 +21,9 @@
                 </VisualState>
                 <VisualState x:Name="Compact">
                     <VisualState.Setters>
-                        <Setter Value="False" Target="splitView.IsPaneOpen"></Setter>
+                        <Setter Value="False" Target="MySplitView.IsPaneOpen"></Setter>
                         <Setter Value="CompactOverlay" 
-           Target="splitView.DisplayMode"></Setter>
+           Target="MySplitView.DisplayMode"></Setter>
                     </VisualState.Setters>
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="500"></AdaptiveTrigger>
@@ -31,8 +31,8 @@
                 </VisualState>
                 <VisualState x:Name="UltraCompact">
                     <VisualState.Setters>
-                        <Setter Value="False" Target="splitView.IsPaneOpen"></Setter>
-                        <Setter Value="Overlay" Target="splitView.DisplayMode"></Setter>
+                        <Setter Value="False" Target="MySplitView.IsPaneOpen"></Setter>
+                        <Setter Value="Overlay" Target="MySplitView.DisplayMode"></Setter>
                     </VisualState.Setters>
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="0"></AdaptiveTrigger>
