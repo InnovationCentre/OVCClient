@@ -27,13 +27,12 @@ namespace OVCClient.Pages
         private GpioPin switch_right;
         private GpioPin switch_container;
 
-        private GpioPin led_red;
-        private GpioPin led_blue;
-        private GpioPin led_green;
-        private GpioPin led_yellow;
+        private GpioPin led_red; //Power LED
+        private GpioPin led_blue; //Robot Unit LED
+        private GpioPin led_green; //Container LED
+        private GpioPin led_yellow; //Comminucation LED
 
-        private Timer blinkingTimer;
-        private DispatcherTimer dispatcherTimer;
+        private DispatcherTimer containerBlink;
         private Dictionary<GpioPin, Ellipse> map;
 
         public HomeStation()
@@ -79,37 +78,37 @@ namespace OVCClient.Pages
             {
                 led_red = gpio.OpenPin(led_red_pin);
                 led_red.SetDriveMode(GpioPinDriveMode.Output);
-                led_red.Write(GpioPinValue.Low); //The red light should always be on
+                led_red.Write(GpioPinValue.High); //The red light should always be on
             }
 
             if (led_blue == null)
             {
                 led_blue = gpio.OpenPin(led_blue_pin);
                 led_blue.SetDriveMode(GpioPinDriveMode.Output);
-                led_red.Write(GpioPinValue.High);
+                led_blue.Write(GpioPinValue.Low);
             }
 
             if (led_green == null)
             {
                 led_green = gpio.OpenPin(led_green_pin);
                 led_green.SetDriveMode(GpioPinDriveMode.Output);
-                led_red.Write(GpioPinValue.High);
+                led_green.Write(GpioPinValue.Low);
             }
 
             if (led_yellow == null)
             {
                 led_yellow = gpio.OpenPin(led_yellow_pin);
                 led_yellow.SetDriveMode(GpioPinDriveMode.Output);
-                led_red.Write(GpioPinValue.High);
+                led_yellow.Write(GpioPinValue.Low);
             }
 
             map.Add(switch_left, layout_switch_left);
             map.Add(switch_right, layout_switch_right);
             map.Add(switch_container, layout_switch_container);
 
-            dispatcherTimer = new DispatcherTimer();
-            dispatcherTimer.Tick += DispatcherTimer_Tick;
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+            containerBlink = new DispatcherTimer();
+            containerBlink.Tick += BlinkingContainer_Tick;
+            containerBlink.Interval = new TimeSpan(0, 0, 1);
 
             //Set listeners for the switches. Whenever the value of th inputs change, the corresponding methods are called.
             switch_left.ValueChanged += Switch_ValueChanged;
@@ -117,32 +116,10 @@ namespace OVCClient.Pages
             switch_right.ValueChanged += Switch_ValueChanged;
             switch_right.ValueChanged += CheckParking;
             switch_container.ValueChanged += Switch_ValueChanged;
+            switch_container.ValueChanged += CheckContainer;
+            CheckContainer(switch_container, null);
 
             layout_status.Text = "Initializing complete, program is running correctly";
-        }
-        
-        private void DispatcherTimer_Tick(object sender, object e)
-        {
-            //Switch High/Low output for the blue LED so it blinks
-            led_blue.Write((led_blue.Read() == GpioPinValue.High) ? GpioPinValue.Low : GpioPinValue.High);
-        }
-
-        private void CheckParking(GpioPin sender, GpioPinValueChangedEventArgs args)
-        {
-            if (switch_right.Read() == GpioPinValue.Low || switch_left.Read() == GpioPinValue.Low) //When only one switch is pressed
-            {
-                Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                {
-                    dispatcherTimer.Start();
-                });
-            }
-            else
-            {
-                Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                {
-                    dispatcherTimer.Stop();
-                });
-            }
         }
 
         private void Switch_ValueChanged(GpioPin sender, GpioPinValueChangedEventArgs args)
@@ -150,6 +127,37 @@ namespace OVCClient.Pages
             if (args.Edge == GpioPinEdge.RisingEdge) //When a switch is  pressed
             {
                 UpdateSwitchLayoutColor(map[sender], sender.Read()); //Update the GUI with the new status
+            }
+        }
+
+        private void CheckContainer(GpioPin sender, GpioPinValueChangedEventArgs args)
+        {
+            if (switch_container.Read() == GpioPinValue.Low) //When the container switches is pressed
+            {
+                containerBlink.Stop();
+                led_green.Write(GpioPinValue.Low); //Turn on green LED
+            }
+            else
+            {
+                containerBlink.Start();
+            }
+        }
+
+        private void BlinkingContainer_Tick(object sender, object e)
+        {
+            //Switch High/Low output for the green LED so it blinks
+            led_green.Write((led_green.Read() == GpioPinValue.High) ? GpioPinValue.Low : GpioPinValue.High);
+        }
+
+        private void CheckParking(GpioPin sender, GpioPinValueChangedEventArgs args)
+        {
+            if (switch_right.Read() == GpioPinValue.High && switch_left.Read() == GpioPinValue.High) //When both switches are pressed
+            {
+                led_blue.Write(GpioPinValue.Low); //Turn on blue LED
+            }
+            else
+            {
+                led_blue.Write(GpioPinValue.High); //Turn off blue LED
             }
         }
 
