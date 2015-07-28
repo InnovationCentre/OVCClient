@@ -37,6 +37,12 @@ namespace OVCClient.Pages
             // Get report
             var report = aggBattery.GetReport();
 
+            if(report.FullChargeCapacityInMilliwattHours == null || report.RemainingCapacityInMilliwattHours == null)
+            {
+                BatteryPercentage.Text = "Percentage: 0";
+                return;
+            }
+
             double batteryDifference = (double)(report.FullChargeCapacityInMilliwattHours - report.RemainingCapacityInMilliwattHours);
             double percentage = (double)(100 - (100 * (batteryDifference / report.FullChargeCapacityInMilliwattHours)));
 
