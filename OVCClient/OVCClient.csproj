@@ -101,6 +101,9 @@
     <Compile Include="Pages\HomeStation.xaml.cs">
       <DependentUpon>HomeStation.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\I2CTest.xaml.cs">
+      <DependentUpon>I2CTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\MessagesOverview.xaml.cs">
       <DependentUpon>MessagesOverview.xaml</DependentUpon>
     </Compile>
@@ -139,6 +142,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Pages\HomeStation.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\I2CTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
