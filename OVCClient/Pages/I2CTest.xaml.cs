@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Windows.Devices.Enumeration;
@@ -50,13 +51,13 @@ namespace OVCClient.Pages
         private void Button_on_Click(object sender, RoutedEventArgs e)
         {
             arduino.Write(GpioPinValue.High);
-            text_output.Text += "GPIO pin set to High" + Environment.NewLine;
+            text_output.Text = "GPIO pin set to High" + Environment.NewLine + text_output.Text;
         }
 
         private void Button_off_Click(object sender, RoutedEventArgs e)
         {
             arduino.Write(GpioPinValue.Low);
-            text_output.Text += "GPIO pin set to Low" + Environment.NewLine;
+            text_output.Text = "GPIO pin set to Low" + Environment.NewLine + text_output.Text;
         }
 
         private void initGPIO()
@@ -84,7 +85,8 @@ namespace OVCClient.Pages
 
             var dis = await DeviceInformation.FindAllAsync(aqs);
             Device = await I2cDevice.FromIdAsync(dis[0].Id, settings);
-            periodicTimer = new Timer(this.TimerCallback, null, 0, 250); // Create a timmer
+
+           // periodicTimer = new Timer(this.TimerCallback, null, 0, 500); // Create a timmer 
         }
 
         private void TimerCallback(object state)
@@ -136,6 +138,25 @@ namespace OVCClient.Pages
 
                     color = !color;
                 });
+        }
+
+        private void button_send_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Device.Write(Encoding.UTF8.GetBytes(text_message.Text));
+            }
+            catch (Exception f)
+            {
+                Debug.WriteLine(f.Message);
+            }
+        }
+
+        static byte[] GetBytes(string str)
+        {
+            byte[] bytes = new byte[str.Length * sizeof(char)];
+            System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
+            return bytes;
         }
     }
 }
