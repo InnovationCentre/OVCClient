@@ -10,6 +10,7 @@ using System.Threading;
 using Windows.Devices.Enumeration;
 using Windows.Devices.Gpio;
 using Windows.Devices.I2c;
+using Windows.Devices.Spi;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI;
@@ -41,20 +42,20 @@ namespace OVCClient.Pages
             initGPIO();
             I2CInit();
 
-            button_off.Click += Button_off_Click;
-            button_on.Click += Button_on_Click;
+            button_off.Click += Button_high_Click;
+            button_on.Click += Button_low_Click;
 
             meter_status.Minimum = 0;
             meter_status.Maximum = 1024; //Range is from 0 to 1024
         }
 
-        private void Button_on_Click(object sender, RoutedEventArgs e)
+        private void Button_high_Click(object sender, RoutedEventArgs e)
         {
             arduino.Write(GpioPinValue.High);
             text_output.Text = "GPIO pin set to High" + Environment.NewLine + text_output.Text;
         }
 
-        private void Button_off_Click(object sender, RoutedEventArgs e)
+        private void Button_low_Click(object sender, RoutedEventArgs e)
         {
             arduino.Write(GpioPinValue.Low);
             text_output.Text = "GPIO pin set to Low" + Environment.NewLine + text_output.Text;
@@ -81,13 +82,16 @@ namespace OVCClient.Pages
         {
             var settings = new I2cConnectionSettings(0x40); // Arduino address
             settings.BusSpeed = I2cBusSpeed.StandardMode;
+            settings.SharingMode = I2cSharingMode.Shared;
+            settings.SlaveAddress = 0x40;
             string aqs = I2cDevice.GetDeviceSelector("I2C1");
 
             var dis = await DeviceInformation.FindAllAsync(aqs);
             Device = await I2cDevice.FromIdAsync(dis[0].Id, settings);
 
-           // periodicTimer = new Timer(this.TimerCallback, null, 0, 500); // Create a timmer 
+            // periodicTimer = new Timer(this.TimerCallback, null, 0, 500); // Create a timmer 
         }
+      
 
         private void TimerCallback(object state)
         {
@@ -102,8 +106,12 @@ namespace OVCClient.Pages
             {
                 Debug.WriteLine(f.Message);
             }
+            UpdateGUIWithNewMessage(ReadBuf);
+        }
 
-            char[] cArray = System.Text.Encoding.UTF8.GetString(ReadBuf, 0, 5).ToCharArray();  // Convert Byte to Char
+        private void UpdateGUIWithNewMessage(byte[] message)
+        {
+            char[] cArray = System.Text.Encoding.UTF8.GetString(message, 0, 5).ToCharArray();  // Convert Byte to Char
             String rawText = new String(cArray); //Convert char array to String
 
             // Update GUI
@@ -127,24 +135,21 @@ namespace OVCClient.Pages
             });
         }
 
-        private void UpdateSwitchLayoutColor()
-        {
-            Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                {
-                    SolidColorBrush mySolidColorBrush = new SolidColorBrush();
-
-                    mySolidColorBrush.Color = (color) ? Color.FromArgb(129, 215, 66, 0) : Color.FromArgb(221, 51, 51, 0);
-                    layout_update.Fill = mySolidColorBrush;
-
-                    color = !color;
-                });
-        }
 
         private void button_send_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                Device.Write(Encoding.UTF8.GetBytes(text_message.Text));
+                byte[] ReadBuf = new byte[64];
+                byte[] message = Encoding.UTF8.GetBytes("RF:" + text_message.Text);
+                byte[] RegAddrBuf = new byte[] { 0x40 };
+                //Device.Write(message);
+
+
+                Device.WriteRead(RegAddrBuf, ReadBuf);
+                Debug.WriteLine(ReadBuf);
+                text_message.Text = "";
+                text_message.Focus(FocusState.Keyboard); 
             }
             catch (Exception f)
             {
@@ -152,11 +157,18 @@ namespace OVCClient.Pages
             }
         }
 
-        static byte[] GetBytes(string str)
+        private void UpdateSwitchLayoutColor()
         {
-            byte[] bytes = new byte[str.Length * sizeof(char)];
-            System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
-            return bytes;
+            Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                SolidColorBrush mySolidColorBrush = new SolidColorBrush();
+
+                mySolidColorBrush.Color = (color) ? Color.FromArgb(129, 215, 66, 0) : Color.FromArgb(221, 51, 51, 0);
+                layout_update.Fill = mySolidColorBrush;
+
+                color = !color;
+            });
         }
+
     }
 }

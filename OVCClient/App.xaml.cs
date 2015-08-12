@@ -1,5 +1,4 @@
 ﻿using Microsoft.WindowsAzure.MobileServices;
-using OVCClient.DataObjects;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,8 +16,6 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-// The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=402347&clcid=0x409
-
 namespace OVCClient
 {
     /// <summary>
@@ -26,14 +23,11 @@ namespace OVCClient
     /// </summary>
     sealed partial class App : Application
     {
-
         // This MobileServiceClient has been configured to communicate with the Azure Mobile Service and
         // Azure Gateway using the application key. You're all set to start working with your Mobile Service!
         public static MobileServiceClient MobileService = new MobileServiceClient(
             "https://ovcmobile-code.azurewebsites.net",
-            "https://default-sql-northeuropea1a6072733954f82813ee36a418b1885.azurewebsites.net",
-            ""
-        );
+            "https://default-sql-northeuropea1a6072733954f82813ee36a418b1885.azurewebsites.net");
         /// <summary>
         /// Allows tracking page views, exceptions and other telemetry through the Microsoft Application Insights service.
         /// </summary>
@@ -45,8 +39,9 @@ namespace OVCClient
         /// </summary>
         public App()
         {
-            TelemetryClient = new Microsoft.ApplicationInsights.TelemetryClient();
-
+            Microsoft.ApplicationInsights.WindowsAppInitializer.InitializeAsync(
+                Microsoft.ApplicationInsights.WindowsCollectors.Metadata |
+                Microsoft.ApplicationInsights.WindowsCollectors.Session);
             this.InitializeComponent();
             this.Suspending += OnSuspending;
         }

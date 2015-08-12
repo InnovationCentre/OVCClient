@@ -55,7 +55,7 @@
                     <TextBlock Text="Send status" FontSize="18" VerticalAlignment="Center"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <Button x:Name="MenuButton3" FontFamily="Segoe MDL2 Assets" Content="&#xE181;" Click="SpeechButton_Click"
+                    <Button x:Name="MenuButton3" FontFamily="Segoe MDL2 Assets" Content="&#xE181;" Click="HomeStationButton_Click"
                          Width="50" Height="50" Background="Transparent"/>
                     <TextBlock Text="Home station" FontSize="18" VerticalAlignment="Center" />
                 </StackPanel>
@@ -63,6 +63,11 @@
                     <Button x:Name="MenuButton4" FontFamily="Segoe MDL2 Assets" Content="&#xE185;" Click="I2CButton_Click"
                          Width="50" Height="50" Background="Transparent"/>
                     <TextBlock Text="I2C" FontSize="18" VerticalAlignment="Center" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="MenuButton5" FontFamily="Segoe MDL2 Assets" Content="&#xE178;" Click="SpeechButton_Click"
+                         Width="50" Height="50" Background="Transparent"/>
+                    <TextBlock Text="Speech" FontSize="18" VerticalAlignment="Center" />
                 </StackPanel>
             </StackPanel>
         </SplitView.Pane>

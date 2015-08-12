@@ -10,6 +10,7 @@ using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
+using Windows.Media.SpeechRecognition;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -20,6 +21,8 @@ namespace OVCClient
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private SpeechRecognizer speechRecognizer;
+
         public MainPage()
         {
             this.InitializeComponent();
@@ -59,22 +62,8 @@ namespace OVCClient
             MySplitView.IsPaneOpen = !MySplitView.IsPaneOpen;
         }
 
-        private void SpeechButton_Click(object sender, RoutedEventArgs e)
+        private void HomeStationButton_Click(object sender, RoutedEventArgs e)
         {
-
-            //    // Create an instance of SpeechRecognizer.
-            //var speechRecognizer = new Windows.Media.SpeechRecognition.SpeechRecognizer();
-
-            //    // Compile the dictation grammar by default.
-            //await speechRecognizer.CompileConstraintsAsync();
-
-            //    // Start recognition.
-            //Windows.Media.SpeechRecognition.SpeechRecognitionResult speechRecognitionResult = await speechRecognizer.RecognizeWithUIAsync();
-
-            //    // Do something with the recognition result.
-            // var messageDialog = new Windows.UI.Popups.MessageDialog(speechRecognitionResult.Text, "Text spoken");
-            //await messageDialog.ShowAsync();
-
             MainFrame.Navigate(typeof(HomeStation));
         }
 
@@ -82,5 +71,31 @@ namespace OVCClient
         {
             MainFrame.Navigate(typeof(I2CTest));
         }
+
+        private async void SpeechButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Create an instance of SpeechRecognizer.
+            this.speechRecognizer = new Windows.Media.SpeechRecognition.SpeechRecognizer();
+
+            // You could create this array dynamically.
+            string[] responses = { "Start", "Stop", "Go left", "Go right" };
+
+            // Add a list constraint to the recognizer.
+            var listConstraint = new Windows.Media.SpeechRecognition.SpeechRecognitionListConstraint(responses, "yesOrNo");
+
+            speechRecognizer.UIOptions.ExampleText = @"Ex. 'Yes', 'No'";
+            speechRecognizer.Constraints.Add(listConstraint);
+
+            // Compile the constraint.
+            await speechRecognizer.CompileConstraintsAsync();
+
+            // Start recognition.
+            Windows.Media.SpeechRecognition.SpeechRecognitionResult speechRecognitionResult = await this.speechRecognizer.RecognizeWithUIAsync();
+
+            // Do something with the recognition result.
+            var messageDialog = new Windows.UI.Popups.MessageDialog(speechRecognitionResult.Text, "Text spoken");
+            await messageDialog.ShowAsync();
+        }
+
     }
 }

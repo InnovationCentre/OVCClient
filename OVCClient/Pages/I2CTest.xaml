@@ -10,8 +10,8 @@
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <StackPanel>
             <StackPanel  Margin="10,10,0,0" Orientation="Horizontal">
-                <Button x:Name="button_on" Content="High" Click="Button_on_Click" />
-                <Button x:Name="button_off" Content="Low" Click="Button_off_Click" Margin="10,0,0,0" />
+                <Button x:Name="button_on" Content="High" />
+                <Button x:Name="button_off" Content="Low"  Margin="10,0,0,0" />
             </StackPanel>
             <StackPanel VerticalAlignment="Top" Margin="10,10,10,0" >
                 <ProgressBar x:Name="meter_status" Height="25" Margin="0,0,0,0" />
