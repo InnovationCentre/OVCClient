@@ -106,6 +106,9 @@
     <Compile Include="Pages\HomeStation.xaml.cs" />
     <Compile Include="Pages\I2CTest.xaml.cs" />
     <Compile Include="Pages\MessagesOverview.xaml.cs" />
+    <Compile Include="Pages\RobotController.xaml.cs">
+      <DependentUpon>RobotController.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\SendStatus.xaml.cs" />
     <Compile Include="Pages\SocketConnection.xaml.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -146,6 +149,10 @@
     <Page Include="Pages\MessagesOverview.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Pages\RobotController.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\SendStatus.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -12,8 +12,6 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using Windows.Media.SpeechRecognition;
 
-// The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
-
 namespace OVCClient
 {
     /// <summary>
@@ -72,13 +70,18 @@ namespace OVCClient
             MainFrame.Navigate(typeof(I2CTest));
         }
 
+        private void RobotControllerButton_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(typeof(RobotController));
+        }
+
         private async void SpeechButton_Click(object sender, RoutedEventArgs e)
         {
             // Create an instance of SpeechRecognizer.
             this.speechRecognizer = new Windows.Media.SpeechRecognition.SpeechRecognizer();
 
             // You could create this array dynamically.
-            string[] responses = { "Start", "Stop", "Go left", "Go right" };
+            string[] responses = { "Start", "Stop", "Go left", "Go right", "Go home", "Go to home", "Go to base" };
 
             // Add a list constraint to the recognizer.
             var listConstraint = new Windows.Media.SpeechRecognition.SpeechRecognitionListConstraint(responses, "yesOrNo");
@@ -92,10 +95,16 @@ namespace OVCClient
             // Start recognition.
             Windows.Media.SpeechRecognition.SpeechRecognitionResult speechRecognitionResult = await this.speechRecognizer.RecognizeWithUIAsync();
 
+            var messageDialog = new Windows.UI.Popups.MessageDialog(speechRecognitionResult.Text, "Command received");
+         
             // Do something with the recognition result.
-            var messageDialog = new Windows.UI.Popups.MessageDialog(speechRecognitionResult.Text, "Text spoken");
+            if (speechRecognitionResult.Text.Equals("Go home") || speechRecognitionResult.Text.Equals("Go to home") || speechRecognitionResult.Text.Equals("Go to base"))
+            {
+                messageDialog = new Windows.UI.Popups.MessageDialog("Okay, heading home now..", "Text spoken");
+            }
+           
             await messageDialog.ShowAsync();
+            
         }
-
     }
 }
